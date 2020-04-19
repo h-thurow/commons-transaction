@@ -516,6 +516,10 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
 
     }
 
+    /**
+     *
+     * @throws ResourceManagerException e. g. 1004: There is already a transaction started with this txId.
+     */
     public void startTransaction(Object txId) throws ResourceManagerException {
 
         if (logger.isFineEnabled()) logger.logFine("Starting Tx " + txId);

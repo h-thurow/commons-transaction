@@ -668,14 +668,14 @@ public class FileResourceManagerTest extends TestCase {
 
             rm.startTransaction("tx2");
             try {
-                // first both threads get a lock, this one on res2
+                // first both threads get a lock, this one on res1
                 rm.deleteResource("tx2", "key1");
                 synchronized (deadlockBarrier1) {
                     deadlockBarrier1.meet();
                     deadlockBarrier1.reset();
                 }
-                //          if I am first, the other thread will be dead, i.e. exactly
-                // one
+                // if I am first, the other thread will be dead, i.e.
+                // exactly one
                 rm.deleteResource("tx2", "key2");
                 rm.commitTransaction("tx2");
             } catch (ResourceManagerException e) {
