@@ -313,6 +313,7 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
      *  
      */
 
+    @Override
     public boolean lockResource(Object resourceId, Object txId) throws ResourceManagerException {
         lockResource(resourceId, txId, false);
         // XXX will never return false as it will either throw or return true
@@ -427,7 +428,7 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
         assureRMReady();
         TransactionContext context = getContext(txId);
         if (context != null) {
-            if (level != ISOLATION_LEVEL_READ_COMMITTED || level != ISOLATION_LEVEL_REPEATABLE_READ) {
+            if (level == ISOLATION_LEVEL_READ_COMMITTED || level == ISOLATION_LEVEL_REPEATABLE_READ) {
                 context.isolationLevel = level;
             } else {
                 throw new ResourceManagerException(ERR_ISOLATION_LEVEL_UNSUPPORTED, txId);
