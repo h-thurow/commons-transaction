@@ -1,6 +1,6 @@
 <div class="section">
 <p>
-Commons Transaction is an old, now dormant Apache project. This is what the developers wrote:
+Commons Transaction is an old, now dormant Apache project. This is what its developers wrote:
 </p><p>
 <i>We have decided to move the project to dormant as we are convinced that the main
 advertised feature <i>transactional file access</i> can not be implemented reliably.
