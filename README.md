@@ -25,6 +25,17 @@ manager.startTransaction(txId);
 OutputStream out = manager.writeResource(txId, "path/to/file");
 // write to out. No need to close the stream.
 manager.commitTransaction(txId);
-
 ```
-While the write goes on, other threads can still read the file concurrently. Only when the "transaction" is committed, the original file is replaced by the newly written one, what is much faster than locking the original file for the time of the write. But to make this work, every thread has to access the files through the same FileResourceManager instance.
+While the write goes on, other threads can still read the file concurrently. Only when the "transaction" is committed, the original file is replaced by the newly written one, what is much faster than locking the original file for the time of the write. 
+
+To make this work, every thread has to access the files through the same FileResourceManager instance:
+ 
+```java
+String txId = manager.generatedUniqueTxId()
+manager.startTransaction(txId);
+manager.setIsolationLevel(txId, ResourceManager.ISOLATION_LEVEL_READ_COMMITTED);
+InputStream inputStream = manager.readResource(txId, "path/to/file");
+// read the inputStream. No need to close the stream.
+manager.commitTransaction(txId);
+ ```
+
