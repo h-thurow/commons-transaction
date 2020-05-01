@@ -1,5 +1,5 @@
 
-### Commons Transaction is an old Apache project. 
+### Commons Transaction is an old Apache project
 
 This is what its developers wrote:
 
