@@ -609,7 +609,7 @@ public class GenericLockTest extends TestCase {
      * 
      * Test shows that two preference locks that are imcompatible do not cause a lock out
      * which was the case with GenericLock 1.5
-     * Before the fix this test would dealock
+     * Before the fix this test would deadlock
      * 
      *                  Owner           Owner           Owner
      * Step             #1              #2              #3

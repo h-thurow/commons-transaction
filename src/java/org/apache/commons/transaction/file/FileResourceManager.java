@@ -155,6 +155,7 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
                 if (removeFile.isFile()) {
                     if (targetFile.exists()) {
                         if (!targetFile.delete()) {
+                            // CLARIFY Why throw an exception, when the file should be deleted anyway?
                             throw new IOException("Could not delete file " + removeFile.getName()
                                     + " in directory targetDir");
                         }
@@ -320,12 +321,17 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
         return true;
     }
 
+    /**
+     * Will never return false as it will either throw or return true.
+     */
+    @Override
     public boolean lockResource(Object resourceId, Object txId, boolean shared) throws ResourceManagerException {
         lockResource(resourceId, txId, shared, true, Long.MAX_VALUE, true);
         // XXX will never return false as it will either throw or return true
         return true;
     }
 
+    @Override
     public boolean lockResource(
         Object resourceId,
         Object txId,
@@ -364,14 +370,17 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
         }
     }
 
+    @Override
     public int getDefaultIsolationLevel() {
         return DEFAULT_ISOLATION_LEVEL;
     }
 
+    @Override
     public int[] getSupportedIsolationLevels() throws ResourceManagerException {
         return new int[] { ISOLATION_LEVEL_READ_COMMITTED, ISOLATION_LEVEL_REPEATABLE_READ };
     }
 
+    @Override
     public boolean isIsolationLevelSupported(int level) throws ResourceManagerException {
         return (level == ISOLATION_LEVEL_READ_COMMITTED || level == ISOLATION_LEVEL_REPEATABLE_READ);
     }
@@ -379,6 +388,7 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
     /**
      * Gets the default transaction timeout in <em>milliseconds</em>.
      */
+    @Override
     public long getDefaultTransactionTimeout() {
         return defaultTimeout;
     }
@@ -392,6 +402,7 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
         defaultTimeout = timeout;
     }
 
+    @Override
     public long getTransactionTimeout(Object txId) throws ResourceManagerException {
         assureRMReady();
         long msecs = 0;
@@ -404,6 +415,7 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
         return msecs;
     }
 
+    @Override
     public void setTransactionTimeout(Object txId, long mSecs) throws ResourceManagerException {
         assureRMReady();
         TransactionContext context = getContext(txId);
@@ -414,6 +426,7 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
         }
     }
 
+    @Override
     public int getIsolationLevel(Object txId) throws ResourceManagerException {
         assureRMReady();
         TransactionContext context = getContext(txId);
@@ -424,6 +437,7 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
         }
     }
 
+    @Override
     public void setIsolationLevel(Object txId, int level) throws ResourceManagerException {
         assureRMReady();
         TransactionContext context = getContext(txId);
@@ -438,6 +452,7 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
         }
     }
 
+    @Override
     public synchronized void start() throws ResourceManagerSystemException {
 
         logger.logInfo("Starting RM at '" + storeDir + "' / '" + workDir + "'");
@@ -461,10 +476,12 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
 
     }
 
+    @Override
     public synchronized boolean stop(int mode) throws ResourceManagerSystemException {
         return stop(mode, getDefaultTransactionTimeout() * DEFAULT_COMMIT_TIMEOUT_FACTOR);
     }
 
+    @Override
     public synchronized boolean stop(int mode, long timeOut) throws ResourceManagerSystemException {
 
         logger.logInfo("Stopping RM at '" + storeDir + "' / '" + workDir + "'");
@@ -486,6 +503,7 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
         return success;
     }
 
+    @Override
     public synchronized boolean recover() throws ResourceManagerSystemException {
         if (operationMode != OPERATION_MODE_STARTED && operationMode != OPERATION_MODE_STARTING) {
             throw new ResourceManagerSystemException(
@@ -506,6 +524,7 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
         return dirty;
     }
 
+    @Override
     public int getTransactionState(Object txId) throws ResourceManagerException {
         TransactionContext context = getContext(txId);
 
@@ -521,6 +540,7 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
      *
      * @throws ResourceManagerException e. g. 1004: There is already a transaction started with this txId.
      */
+    @Override
     public void startTransaction(Object txId) throws ResourceManagerException {
 
         if (logger.isFineEnabled()) logger.logFine("Starting Tx " + txId);
@@ -545,6 +565,7 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
         }
     }
 
+    @Override
     public void markTransactionForRollback(Object txId) throws ResourceManagerException {
         assureRMReady();
         TransactionContext context = txInitialSaneCheckForWriting(txId);
@@ -557,6 +578,7 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
         }
     }
 
+    @Override
     public int prepareTransaction(Object txId) throws ResourceManagerException {
         assureRMReady();
         // do not allow any further writing or commit or rollback when db is corrupt
@@ -616,6 +638,7 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
         }
     }
 
+    @Override
     public void rollbackTransaction(Object txId) throws ResourceManagerException {
         assureRMReady();
         TransactionContext context = txInitialSaneCheckForWriting(txId);
@@ -654,6 +677,12 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
         }
     }
 
+    /**
+     *
+     * @param txId identifier for the transaction to be committed
+     * @throws ResourceManagerException e. g. when transaction was marked for rollback only
+     */
+    @Override
     public void commitTransaction(Object txId) throws ResourceManagerException {
         assureRMReady();
         TransactionContext context = txInitialSaneCheckForWriting(txId);
@@ -698,6 +727,7 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
         }
     }
 
+    @Override
     public boolean resourceExists(Object resourceId) throws ResourceManagerException {
         // create temporary light weight tx
         Object txId;
@@ -724,15 +754,18 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
         return exists;
     }
 
+    @Override
     public boolean resourceExists(Object txId, Object resourceId) throws ResourceManagerException {
         lockResource(resourceId, txId, true);
         return (getPathForRead(txId, resourceId) != null);
     }
 
+    @Override
     public void deleteResource(Object txId, Object resourceId) throws ResourceManagerException {
         deleteResource(txId, resourceId, true);
     }
 
+    @Override
     public void deleteResource(Object txId, Object resourceId, boolean assureOnly) throws ResourceManagerException {
 
         if (logger.isFineEnabled()) logger.logFine(txId + " deleting " + resourceId);
@@ -767,10 +800,12 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
         }
     }
 
+    @Override
     public void createResource(Object txId, Object resourceId) throws ResourceManagerException {
         createResource(txId, resourceId, true);
     }
 
+    @Override
     public void createResource(Object txId, Object resourceId, boolean assureOnly) throws ResourceManagerException {
 
         if (logger.isFineEnabled()) logger.logFine(txId + " creating " + resourceId);
@@ -843,6 +878,10 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
         deleteResource(txId, fromResourceId, false);
     }
 
+    /**
+     *  In contrast to what is said in {@link ResourceManager#readResource(Object, Object)} the stream is closed automatically on commit or rollback.
+     */
+    @Override
     public InputStream readResource(Object resourceId) throws ResourceManagerException {
         // create temporary light weight tx
         Object txId;
@@ -862,6 +901,10 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
         return is;
     }
 
+    /**
+     *  In contrast to what is said in {@link ResourceManager#readResource(Object, Object)} the stream is closed automatically on commit or rollback.
+     */
+    @Override
     public InputStream readResource(Object txId, Object resourceId) throws ResourceManagerException {
 
         if (logger.isFineEnabled()) logger.logFine(txId + " reading " + resourceId);
@@ -883,10 +926,17 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
         }
     }
 
+    /**
+     * In contrast to what is said in {@link ResourceManager#writeResource(Object, Object)} the stream is closed automatically on commit or rollback.
+     */
+    @Override
     public OutputStream writeResource(Object txId, Object resourceId) throws ResourceManagerException {
         return writeResource(txId, resourceId, false);
     }
 
+    /**
+     * @see #writeResource(Object, Object)
+     */
     public OutputStream writeResource(Object txId, Object resourceId, boolean append) throws ResourceManagerException {
 
         if (logger.isFineEnabled()) logger.logFine(txId + " writing " + resourceId);
@@ -1505,6 +1555,9 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
             lockManager.releaseAll(txId);
         }
 
+        /**
+         * Closes all open streams returned by methods of this resource manager.
+         */
         public synchronized void closeResources() {
             synchronized (globalOpenResources) {
                 for (Iterator it = openResources.iterator(); it.hasNext();) {
@@ -1521,6 +1574,10 @@ public class FileResourceManager implements ResourceManager, ResourceManagerErro
             }
         }
 
+        /**
+         * Save state to [workDir]/[txId]/transaction.log
+         * @throws ResourceManagerException
+         */
         public synchronized void saveState() throws ResourceManagerException {
             String statePath = getTransactionBaseDir(txId) + "/" + CONTEXT_FILE;
             File file = new File(statePath);

@@ -132,6 +132,7 @@ public class VirtualAdminCommandsFileResourceManager extends
         super(workDir, storeDir, idMapper, txIdMapper, logger, debug);
     }
 
+    @Override
     public boolean resourceExists(Object resourceId)
             throws ResourceManagerException {
         if (isVirtualAdminId(resourceId)) {
@@ -143,6 +144,7 @@ public class VirtualAdminCommandsFileResourceManager extends
         return super.resourceExists(resourceId);
     }
 
+    @Override
     public boolean resourceExists(Object txId, Object resourceId)
             throws ResourceManagerException {
         if (isVirtualAdminId(resourceId)) {
@@ -154,6 +156,7 @@ public class VirtualAdminCommandsFileResourceManager extends
         return super.resourceExists(txId, resourceId);
     }
 
+    @Override
     public void deleteResource(Object txId, Object resourceId)
             throws ResourceManagerException {
 
@@ -162,14 +165,16 @@ public class VirtualAdminCommandsFileResourceManager extends
         super.deleteResource(txId, resourceId);
     }
 
+    @Override
     public void deleteResource(Object txId, Object resourceId,
-            boolean assureOnly) throws ResourceManagerException {
+                               boolean assureOnly) throws ResourceManagerException {
 
         checkForVirtualAdminCommand(resourceId);
 
         super.deleteResource(txId, resourceId, assureOnly);
     }
 
+    @Override
     public void createResource(Object txId, Object resourceId)
             throws ResourceManagerException {
 
@@ -178,8 +183,9 @@ public class VirtualAdminCommandsFileResourceManager extends
         super.createResource(txId, resourceId);
     }
 
+    @Override
     public void createResource(Object txId, Object resourceId,
-            boolean assureOnly) throws ResourceManagerException {
+                               boolean assureOnly) throws ResourceManagerException {
 
         checkForVirtualAdminCommand(resourceId);
 
@@ -206,6 +212,7 @@ public class VirtualAdminCommandsFileResourceManager extends
         super.moveResource(txId, fromResourceId, toResourceId, overwrite);
     }
 
+    @Override
     public InputStream readResource(Object resourceId)
             throws ResourceManagerException {
 
@@ -217,6 +224,7 @@ public class VirtualAdminCommandsFileResourceManager extends
         return super.readResource(resourceId);
     }
 
+    @Override
     public InputStream readResource(Object txId, Object resourceId)
             throws ResourceManagerException {
 
@@ -294,8 +302,9 @@ public class VirtualAdminCommandsFileResourceManager extends
         return command.equals("recover");
     }
 
+    @Override
     public OutputStream writeResource(Object txId, Object resourceId,
-            boolean append) throws ResourceManagerException {
+                                      boolean append) throws ResourceManagerException {
 
         checkForVirtualAdminCommand(resourceId);
 
