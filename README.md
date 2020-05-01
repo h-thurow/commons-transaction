@@ -22,6 +22,6 @@ JDK1.2 and should have minimal dependencies.</i>
 </p><p>
 <i>The optimal - but maybe impudent - long term goal would be to create the transactional counterpart
 of <a class="externalLink" href="http://gee.cs.oswego.edu/dl/classes/EDU/oswego/cs/dl/util/concurrent/intro.html">Doug
-Lea's fabulous concurrent package</a> which recently made it to Java 5.0."</i>
+Lea's fabulous concurrent package</a> which recently made it to Java 5.0.</i>
 </p>
 </div>
